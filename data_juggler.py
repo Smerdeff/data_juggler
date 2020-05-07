@@ -180,7 +180,48 @@ class data_juggler(data_juggler_base):
         #     value[0]['vidprice'][0]['null_string']=''
         #     return json.dumps(value,ensure_ascii=self.ensure_ascii, default=self.default)
 
+    def join(self, query_name, free_reference=True):
+        """
 
+        :param query_name:
+        :param free_reference:
+        :return:
+        """
+        def join_filter(f_set, key, value):
+            for row in f_set:
+                if key in row:
+                    if row[key] == value:
+                        yield row
+
+        for i, u_set in enumerate(self.data[query_name]):
+            if u_set is not None:
+                if len(self.data[query_name]) > (i + 1):  # Режим состыковки датасетов
+                    for row in u_set:  # Побежали по строкам
+                        for key in row:  # Побежали по ключам в строке
+                            # TODO переделать на возможность использовать символ ":" в названии через "\"
+                            if key[-1:] == ':':  # Ищем с окончанием на ":"
+                                filter_value = row[key]
+                                # print(key, filter_value)
+
+                                row[key] = []
+                                for f_set in self.data[query_name][i + 1:]:  # Перебираем все датасеты, кроме основного.
+                                    if f_set:
+                                        # Присвоили подходяхий список из датасета в основной датасет текущей строоке
+                                        row[key] += list(
+                                            join_filter(f_set, ':' + key[:-1], filter_value)
+                                        )
+                                row[key[:-1]] = row.pop(key)
+
+
+        # Чистим ссылки
+        if free_reference:
+            for dataset in self.data[query_name]:
+                if dataset:
+                    for row in dataset:
+                        for key in row.copy():
+                            if key[0:1] == ':':
+                                row.pop(key, None)
+        return True
 
     def to_json(self, query_name):
         # return json.dumps(self.data[query_name][0], ensure_ascii=False, cls=self.dj_JSONEncoder)
@@ -691,30 +732,19 @@ def save_data(destination, destination_data):
 
 
 if __name__ == '__main__':
-    # send_email('smerdeva@gmail.com', 'tests123', 'Privet', '' )
-    # send_email('smerdev@p-magic.com', 'тест почты1', 'Привет')
+    # source = "sqlserver://sa:pass@server/base/?"
+    source = "sqlserver://sa:ai3271che@fusi/pump_pm/?"
+    data_source =source+ 'data=sp_data_juggler_test1'
 
-    # mail = EmailMessage(report_name, report_name, 'smerdev@p-magic.com', email.split(';'))
-    # mail.attach(report_name, response.getvalue(), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    # mail.send()
+    dj = data_juggler(data_source)
 
-    source = "sqlserver://sa:pass@server/base/?"
-    # mt_data_source = source + "abc=\"select * from  mt_drogerie_data where id=101\""
+    # print(dj.data["data"])
+    dj.join("data")
+    # print(dj.data["data"][0])
 
-    # qwe = data_juggler(_sqlserver_driver='{SQL Server Native Client 11.0}')
-    # print(mt_data_source)
-    dj = data_juggler(source)
-    # dj.url('?just=select top 1 * from mt_drogerie_data&abc="sp_drogerie_price_type"')
+    print (dj.to_json("data"))
 
-    # for l in  dj.stored_get_params('pump_pm..sp_drogerie_price_type'):        print(l)
-    dj.open_stored('sp_name', {'@qwe': 23, 'committed_sys_change_version': 0, '@full': True},
-                   query_name='data')
-    print(dj.data['data'])
-    # dj.open('qwe1', 'select top 1 * from mt_drogerie_data')
-    # print(qwe.__dict__)
-    # dj.sqlserver_driver = 'qwe'
-    # print(dj.__dict__)
-
-    # print (dj.data)
-
-    # print('data_juggler.py')
+    # dj.open_stored()
+    # dj.open_stored('sp_name', {'@qwe': 23, 'committed_sys_change_version': 0, '@full': True},
+    #                query_name='data')
+    # print(dj.data['data'])
