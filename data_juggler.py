@@ -136,7 +136,7 @@ class data_juggler(data_juggler_base):
         self._db = None
         self._sqlserver_port = 1433
         self._auto_commit = True
-        self._sqlserver_driver = '{SQL Server Native Client 10.0}'
+        self._sqlserver_driver = '{SQL Server Native Client 11.0}'
         self.__dict__.update(kwargs)
         self.data = {}
 
@@ -312,7 +312,7 @@ def send_email(addr_to, msg_subj, msg_text, content=None, ContentFileName=None):
     # config.read('data_juggler.ini')
 
     addr_from = config['email']['HOST_USER']  # Отправитель
-    password = config['email']['HOST_PASSWORD']  # 'Lj3vf%w2'                                    # Пароль
+    password = config['email']['HOST_PASSWORD']
     HOST = config['email']['HOST']
     PORT = config['email']['PORT']
     USE_TLS = config['email']['USE_TLS']
@@ -732,18 +732,6 @@ def save_data(destination, destination_data):
 
 
 if __name__ == '__main__':
-    source = "sqlserver://login:pass@server/base/?"
-    data_source =source+ 'data=sp_data_juggler_test1'
+    print ('data_juggler')
 
-    dj = data_juggler(data_source)
 
-    # print(dj.data["data"])
-    dj.join("data")
-    # print(dj.data["data"][0])
-
-    print (dj.to_json("data"))
-
-    # dj.open_stored()
-    # dj.open_stored('sp_name', {'@qwe': 23, 'committed_sys_change_version': 0, '@full': True},
-    #                query_name='data')
-    # print(dj.data['data'])
