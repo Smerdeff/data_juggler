@@ -37,13 +37,9 @@ select 2 [:doc_id],
 from data_juggler import data_juggler
 
 if __name__ == '__main__':
-    source = "sqlserver://sa:pass@server/base/?"
-    data_source =source+ 'data=sp_data_juggler_test1'
-
+    source = "sqlserver://login:pass@server/base/?"
+    data_source = source + "data=sp_data_juggler_test1"
     dj = data_juggler(data_source)
-
-    # print(dj.data["data"])
     dj.join("data")
-    # print(dj.data["data"][0])
+    print(dj.to_json("data"))
 
-    print (dj.to_json("data"))
