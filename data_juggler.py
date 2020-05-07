@@ -732,8 +732,7 @@ def save_data(destination, destination_data):
 
 
 if __name__ == '__main__':
-    # source = "sqlserver://sa:pass@server/base/?"
-    source = "sqlserver://sa:ai3271che@fusi/pump_pm/?"
+    source = "sqlserver://login:pass@server/base/?"
     data_source =source+ 'data=sp_data_juggler_test1'
 
     dj = data_juggler(data_source)
