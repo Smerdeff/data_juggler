@@ -34,10 +34,14 @@ select 2 [:doc_id],
 
 """
 
+from settings import sql
+
 from data_juggler import data_juggler
 
 if __name__ == '__main__':
-    source = "sqlserver://login:pass@server/base/?"
+    source = "sqlserver://{0}:{1}@{2}/{3}/?".format(sql.login, sql.password,sql.server,sql.db)
+
+    print(source)
     data_source = source + "data=sp_data_juggler_test1"
     dj = data_juggler(data_source)
     dj.join("data")

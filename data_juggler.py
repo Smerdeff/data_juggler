@@ -3,10 +3,10 @@ import logging
 from logging.handlers import BufferingHandler
 from json import encoder
 import itertools
-import paramiko
+# import paramiko
 # import pysftp
-import xmltodict
-import spryreport
+# import xmltodict
+# import spryreport
 import zipfile
 import io
 import sys
@@ -113,6 +113,7 @@ class data_juggler(data_juggler_base):
                 conn_str = conn_str + 'Trusted_Connection=yes;'
             else:
                 conn_str = conn_str + 'UID=' + username + ';PWD=' + password + ';'
+            # print(conn_str)
             self._db = pyodbc.connect(conn_str, autocommit=self.auto_commit)
             self._db_option = (scheme, server, database, driver, port, username, password)
             return True
@@ -126,7 +127,7 @@ class data_juggler(data_juggler_base):
             database = url_p.path.split("/")[1]  # TODO Переделать с учетом инстанса
             server = url_p.hostname
             if database is not None and server is not None:
-                self.connect(url_p.scheme, server, database)
+                self.connect(scheme=url_p.scheme, server=server, database=database, username=url_p.username, password=url_p.password)
         if self._db:
             for name, query in parse_qsl(url_p.query):
                 self.open(query_name=name, query=self._dequote(query))
