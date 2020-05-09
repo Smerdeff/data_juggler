@@ -6,7 +6,7 @@ import itertools
 # import paramiko
 # import pysftp
 # import xmltodict
-# import spryreport
+import spryreport
 import zipfile
 import io
 import sys
@@ -87,21 +87,19 @@ class data_juggler_base:
 
     sqlserver_driver = property(get_sqlserver_driver, set_sqlserver_driver, del_sqlserver_driver, 'sqlserver driver')
 
+    def get_db(self):
+        return self._db
+
+    def set_db(self, value):
+        self._db = value
+
+    def del_db(self):
+        del self._db
+
+    db = property(get_db, set_db, del_db, 'db')
 
 class data_juggler(data_juggler_base):
-    # def get_data(self):
-    #     return self._data
-    #
-    # def set_data(self, value):
-    #     self._data = value
-    #
-    # def del_data(self):
-    #     self._data = {}
-    #
-    # data = property(get_data, set_data, del_data, 'all data')
-
-
-    def connect(self, scheme, server, database, driver=None, port=None, username=None, password=None):
+    def connect(self, scheme, server=None, database=None, driver=None, port=None, username=None, password=None):
         if scheme in ['sqlserver']:
             if driver is None:
                 driver = self._sqlserver_driver
@@ -117,8 +115,16 @@ class data_juggler(data_juggler_base):
             self._db = pyodbc.connect(conn_str, autocommit=self.auto_commit)
             self._db_option = (scheme, server, database, driver, port, username, password)
             return True
+        if scheme in ['sqlite', 'sqlite3']:
+            if driver is None:
+                driver = self._sqlite_driver
+            conn_str = 'DRIVER=' + driver + ';DATABASE=' + database + ';'
+            self._db = pyodbc.connect(conn_str, autocommit=self.auto_commit)
+            self._db_option = (scheme, server, database, driver, port, username, password)
+            return True
+
+
         return False
-        # pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT='+port+';DATABASE='+database+';UID='+username+';PWD='+ password)
 
     def url(self, url):
         url_p = urlparse(url, False)
@@ -138,6 +144,7 @@ class data_juggler(data_juggler_base):
         self._sqlserver_port = 1433
         self._auto_commit = True
         self._sqlserver_driver = '{SQL Server Native Client 11.0}'
+        self._sqlite_driver = 'SQLite3 ODBC Driver'
         self.__dict__.update(kwargs)
         self.data = {}
 
@@ -283,7 +290,6 @@ class data_juggler(data_juggler_base):
         while cur.nextset():
             data[query_name].append(self._get_named_list(cur))
 
-        # if self._auto_commit: cur.commit()
         cur.close()
         return True
 
