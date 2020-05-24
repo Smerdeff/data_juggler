@@ -208,6 +208,7 @@ class data_juggler(data_juggler_base):
                         for key in row:  # Побежали по ключам в строке
                             # TODO переделать на возможность использовать символ ":" в названии через "\"
                             if key[-1:] == ':':  # Ищем с окончанием на ":"
+                                # print(row)
                                 filter_value = row[key]
                                 # print(key, filter_value)
 
@@ -229,7 +230,7 @@ class data_juggler(data_juggler_base):
                         for key in row.copy():
                             if key[0:1] == ':':
                                 row.pop(key, None)
-        return True
+        return self
 
     def to_json(self, query_name):
         # return json.dumps(self.data[query_name][0], ensure_ascii=False, cls=self.dj_JSONEncoder)

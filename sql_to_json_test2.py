@@ -20,12 +20,23 @@ if __name__ == '__main__':
     #                )
     # conn.commit()
     # cnxn = pyodbc.connect("Driver=SQLite3 ODBC Driver;Database=data_juggler_test.sqlite3")
-
-    dj.connect(scheme='sqlite', database="data_juggler_test.sqlite3")
-    dj.connect(scheme='sqlite', database="chinook.db")
     # dj.db = cnxn
 
-    dj.open(query="select * from albums", query_name="reports")
-    print(dj.data)
-    # dj.join("data")
+    # dj.data[Name of Sets][Number set][Number row][Name cell]
+    # dj.connect(scheme='sqlite', database="data_juggler_test.sqlite3")
+    dj.connect(scheme='sqlite', database="chinook.db")
+
+    dj.data['invoices']=[[{"sheet1:": 1, "sheet2:": 2}]]
+
+    dj.open(query="select  *, InvoiceId as [items:], 1 as [:sheet1]  from invoices limit 2", query_name="invoices")
+    dj.open(query="select *, InvoiceId as [:items]  from invoice_items", query_name="invoices")
+
+    # print(dj.data['invoices'][0])
+    # print(dj.data['invoices'][1])
+
+    dj.join('invoices')
+    json = dj.to_json("invoices")
+    # print(dj.data['invoices'][0])
+    print(json)
+
     # print(dj.to_json("data"))
