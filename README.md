@@ -46,7 +46,7 @@ from data_juggler import data_juggler
 if __name__ == '__main__':
     source = "sqlserver://login:pass@server/base/?"
     data_source = source + "data=sp_data_juggler_test1"
-    dj = data_juggler(data_source)
+    dj = data_juggler.data_juggler(data_source)
     dj.join("data")
     print(dj.to_json("data"))
 ```
